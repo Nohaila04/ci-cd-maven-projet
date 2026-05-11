@@ -1,20 +1,18 @@
 pipeline {
     agent any
     
-    
-    
     stages {
         stage('Build') {
             steps {
                 echo '=== BUILD ==='
-                sh 'mvn clean compile'
+                bat 'mvn clean compile'
             }
         }
         
         stage('Test') {
             steps {
                 echo '=== TEST ==='
-                sh 'mvn test'
+                bat 'mvn test'
             }
             post {
                 always {
@@ -26,7 +24,7 @@ pipeline {
         stage('Package') {
             steps {
                 echo '=== PACKAGE ==='
-                sh 'mvn package -DskipTests'
+                bat 'mvn package -DskipTests'
             }
             post {
                 success {
@@ -38,20 +36,20 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '=== DEPLOY ==='
-                sh 'echo "Déploiement simulé - Le WAR est prêt"'
+                bat 'echo "Deploiement simule - WAR pret"'
             }
         }
     }
     
     post {
         always {
-            echo 'Pipeline terminé'
+            echo 'Pipeline termine'
         }
         success {
-            echo '✅ SUCCÈS'
+            echo '✅ SUCCES'
         }
         failure {
-            echo '❌ ÉCHEC'
+            echo '❌ ECHEC'
         }
     }
 }
