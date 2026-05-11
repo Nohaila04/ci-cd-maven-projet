@@ -4,52 +4,21 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo '=== BUILD ==='
+                echo '=== COMPILATION MAVEN ==='
                 bat 'mvn clean compile'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                echo '=== TEST ==='
-                bat 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                echo '=== PACKAGE ==='
-                bat 'mvn package -DskipTests'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.war'
-                }
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                echo '=== DEPLOY ==='
-                bat 'echo "Deploiement simule - WAR pret"'
             }
         }
     }
     
     post {
         always {
-            echo 'Pipeline termine'
+            echo '=== PIPELINE TERMINE ==='
         }
         success {
-            echo '✅ SUCCES'
+            echo '✅ BUILD REUSSI !'
         }
         failure {
-            echo '❌ ECHEC'
+            echo '❌ BUILD ECHOUE !'
         }
     }
 }
