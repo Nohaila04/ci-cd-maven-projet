@@ -4,8 +4,21 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo '=== COMPILATION MAVEN ==='
+                echo '=== 1. COMPILATION ==='
                 bat 'mvn clean compile'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo '=== 2. EXECUTION DES TESTS ==='
+                bat 'mvn test'
+            }
+            post {
+                always {
+                    // Publier les rapports de test même si échec
+                    junit 'target/surefire-reports/*.xml'
+                }
             }
         }
     }
@@ -15,10 +28,10 @@ pipeline {
             echo '=== PIPELINE TERMINE ==='
         }
         success {
-            echo '✅ BUILD REUSSI !'
+            echo '✅ BUILD + TEST REUSSIS !'
         }
         failure {
-            echo '❌ BUILD ECHOUE !'
+            echo '❌ ECHEC (Build ou Test)'
         }
     }
 }
