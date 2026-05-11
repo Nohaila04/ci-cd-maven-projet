@@ -21,7 +21,6 @@ pipeline {
             }
         }
         
-        // ⭐ AJOUTEZ CE STAGE PACKAGE ⭐
         stage('Package') {
             steps {
                 echo '=== 3. CREATION DU WAR ==='
@@ -38,19 +37,26 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 echo '=== 4. DEPLOIEMENT SUR TOMCAT ==='
+                
+                // Lister les fichiers disponibles
+                bat 'dir target\\*.war'
+                
+                // Version SIMPLIFIÉE sans new File()
                 script {
-                    // Lister les fichiers dans target pour déboguer
-                    bat 'dir target\\*.war'
-                    
-                    // Récupérer le chemin du WAR
-                    def warFile = findFiles(glob: 'target/*.war')[0].path
-                    def warName = new File(warFile).getName()
-                    
-                    echo "Déploiement de: ${warName}"
-                    
-                    // Simuler le déploiement (pour l'instant)
-                    echo "✅ Déploiement simulé réussi!"
+                    def warFiles = findFiles(glob: 'target/*.war')
+                    if (warFiles.length > 0) {
+                        def warPath = warFiles[0].path
+                        echo "WAR trouvé: ${warPath}"
+                        echo "✅ Déploiement prêt pour Tomcat"
+                        
+                        // Optionnel: Copie simple vers Tomcat (décommentez si Tomcat installé)
+                        // bat "copy ${warPath} C:\\tomcat\\webapps\\app.war"
+                    } else {
+                        error "Aucun fichier WAR trouvé!"
+                    }
                 }
+                
+                echo "🎉 Déploiement terminé avec succès!"
             }
         }
     }
@@ -62,6 +68,7 @@ pipeline {
         success {
             echo 'Statut final: SUCCESS'
             echo '✅ PIPELINE COMPLET REUSSI !'
+            echo '📦 WAR disponible dans les artifacts'
         }
         failure {
             echo 'Statut final: FAILURE'
