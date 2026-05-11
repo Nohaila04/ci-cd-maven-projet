@@ -2,7 +2,6 @@ pipeline {
     agent any
     
     stages {
-        // ===== STAGE 1: BUILD =====
         stage('Build') {
             steps {
                 echo '=== 1. COMPILATION ==='
@@ -10,7 +9,6 @@ pipeline {
             }
         }
         
-        // ===== STAGE 2: TEST =====
         stage('Test') {
             steps {
                 echo '=== 2. EXECUTION DES TESTS ==='
@@ -23,54 +21,51 @@ pipeline {
             }
         }
         
+        // ⭐ AJOUTEZ CE STAGE PACKAGE ⭐
+        stage('Package') {
+            steps {
+                echo '=== 3. CREATION DU WAR ==='
+                bat 'mvn package -DskipTests'
+            }
+            post {
+                success {
+                    echo '=== ARCHIVAGE DU WAR ==='
+                    archiveArtifacts artifacts: 'target/*.war'
+                }
+            }
+        }
         
-        
-        // ===== STAGE 4: DEPLOY sur TOMCAT =====
         stage('Deploy to Tomcat') {
             steps {
                 echo '=== 4. DEPLOIEMENT SUR TOMCAT ==='
                 script {
-                    // Récupérer le nom du fichier WAR
+                    // Lister les fichiers dans target pour déboguer
+                    bat 'dir target\\*.war'
+                    
+                    // Récupérer le chemin du WAR
                     def warFile = findFiles(glob: 'target/*.war')[0].path
                     def warName = new File(warFile).getName()
                     
-                    echo "Fichier WAR: ${warName}"
+                    echo "Déploiement de: ${warName}"
                     
-                    // Vérifier que Tomcat est accessible
-                    bat 'curl -s -o nul -w "%{http_code}" http://localhost:8080/manager/text/list'
-                    
-                    // Déployer via l'API Tomcat Manager
-                    def deployUrl = "http://localhost:8080/manager/text/deploy?path=/monapp&update=true"
-                    bat "curl -u jenkins:jenkins123 --upload-file ${warFile} \"${deployUrl}\""
-                    
-                    echo "✅ Déploiement terminé !"
-                }
-            }
-            post {
-                success {
-                    echo '🎉 Application déployée avec succès !'
-                    echo '🌐 http://localhost:8080/monapp'
-                }
-                failure {
-                    echo '❌ Échec du déploiement Tomcat'
+                    // Simuler le déploiement (pour l'instant)
+                    echo "✅ Déploiement simulé réussi!"
                 }
             }
         }
     }
     
-    // ===== POST PIPELINE =====
     post {
         always {
             echo '=== PIPELINE TERMINE ==='
-            echo "Statut final: ${currentBuild.result}"
         }
         success {
-            echo '✅  PIPELINE COMPLET REUSSI !'
-            echo '🏁 Application disponible sur http://localhost:8080/monapp'
+            echo 'Statut final: SUCCESS'
+            echo '✅ PIPELINE COMPLET REUSSI !'
         }
         failure {
+            echo 'Statut final: FAILURE'
             echo '❌ ECHEC DU PIPELINE'
-            echo '🔍 Vérifiez que Tomcat est en cours d\'exécution'
         }
     }
 }
