@@ -14,12 +14,7 @@ pipeline {
                 echo '=== 2. EXECUTION DES TESTS ==='
                 bat 'mvn test'
             }
-            post {
-                always {
-                    // Publier les rapports de test même si échec
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
+            // Supprimez la partie "post" pour l'instant
         }
     }
     
