@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: mon-app-maven
+    runtime: image
+    repo: https://github.com/Nohaila04/ci-cd-maven-projet
+    buildCommand: mvn clean package
+    startCommand: java -jar target/*.war
+    envVars:
+      - key: JAVA_VERSION
+        value: 11
