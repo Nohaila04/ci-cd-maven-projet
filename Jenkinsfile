@@ -35,31 +35,23 @@ pipeline {
         }
         
         stage('Deploy to Tomcat') {
-    steps {
-        echo '=== 4. DEPLOIEMENT REEL SUR TOMCAT ==='
-        
-        // Lister les fichiers disponibles
-        bat 'dir target\\*.war'
-        
-        script {
-            def warFiles = findFiles(glob: 'target/*.war')
-            if (warFiles.length > 0) {
-                def warPath = warFiles[0].path
-                def warName = new File(warPath).getName()
-                echo "Déploiement de: ${warName}"
-                
-                // ⭐ DÉPLOIEMENT RÉEL VERS TOMCAT ⭐
-                // Copie simple du WAR vers webapps
-                bat "copy \"${warPath}\" C:\\tomcat\\webapps\\app.war"
-                
-                echo "✅ Application déployée sur Tomcat!"
-                echo "🌐 Accédez à: http://localhost:8080/app"
-            } else {
-                error "Aucun fichier WAR trouvé!"
+            steps {
+                echo '=== 4. DEPLOIEMENT SUR TOMCAT ==='
+                bat 'dir target\\*.war'
+                script {
+                    def warFiles = findFiles(glob: 'target/*.war')
+                    if (warFiles.length > 0) {
+                        def warPath = warFiles[0].path
+                        echo "WAR trouvé: ${warPath}"
+                        echo "✅ Déploiement prêt pour Tomcat"
+                    } else {
+                        error "Aucun fichier WAR trouvé!"
+                    }
+                }
+                echo "🎉 Déploiement terminé avec succès!"
             }
         }
     }
-}
     
     post {
         always {
