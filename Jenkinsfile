@@ -14,7 +14,24 @@ pipeline {
                 echo '=== 2. EXECUTION DES TESTS ==='
                 bat 'mvn test'
             }
-            // Supprimez la partie "post" pour l'instant
+            post {
+                always {
+                    // Le dossier target/surefire-reports sera créé après mvn test
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                echo '=== 3. CREATION DU WAR ==='
+                bat 'mvn package -DskipTests'
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'target/*.war'
+                }
+            }
         }
     }
     
@@ -23,10 +40,10 @@ pipeline {
             echo '=== PIPELINE TERMINE ==='
         }
         success {
-            echo '✅ BUILD + TEST REUSSIS !'
+            echo '✅ PIPELINE COMPLET REUSSI !'
         }
         failure {
-            echo '❌ ECHEC (Build ou Test)'
+            echo '❌ ECHEC DU PIPELINE'
         }
     }
 }
